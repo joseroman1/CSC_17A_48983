@@ -1,0 +1,1 @@
+WRITE A PROGRAM THAT ASKS THE USER for two files names. THE FIRST will be opened for input and the second file will be opened for ouput.
