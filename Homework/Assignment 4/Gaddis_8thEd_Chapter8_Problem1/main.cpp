@@ -7,7 +7,6 @@
 
 //System Libraries
 #include <iostream>
-#include <iomanip>
 using namespace std;
 
 
@@ -18,15 +17,25 @@ struct mveData { //MovieData
     int year; //Year Released
     float time; //Running Time
 };
+
+//Function Prototypes
+void showInfo(mveData);
+
+//Execution Begins Here
+
 int main(int argc, char** argv) {
     mveData movie1 = {"Steve Jobs", "Danny Boyle", 2015, 122};
     mveData movie2 = {"Gone Girl", "David Fincher", 2014, 144};
     
-    cout<< fixed << showpoint << setprecision(2);
-    
-    //Input the first movie
-    cout<< "Title: "<<movie1.title<<endl;
-
+    showInfo(movie1);
+   
     return 0;
 }
-
+  
+void showInfo(mveData p){
+//Input the first movie
+    cout<< "Title: "<<p.title<<endl;
+    cout<< "Director: "<<p.director<<endl;
+    cout<< "Year: "<<p.year<<endl;
+    cout<< "Running Time: "<<p.time<<" Minutes"<<endl;
+}
