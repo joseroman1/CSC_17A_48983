@@ -33,18 +33,18 @@ int main(int argc, char** argv) {
     IndxCol *str=fill(n);
     //Print the structure
     cout<<"The original index array"<<endl;
-    prntAry(str->indx,str->size,col);
+    prntAry((*str).indx,(*str).size,col);
     cout<<"The original data array"<<endl;
-    prntAry(str->array,str->size,col);
+    prntAry((*str).array,(*str).size,col);
     cout<<"The original data array using the indexed array"<<endl;
     prntStr(str,col);
     //Sort the data using an index, hence data base sort
     mrkSort(str);
     //Print the structure
     cout<<"The index array after sorting"<<endl;
-    prntAry(str->indx,str->size,col);
+    prntAry((*str).indx,(*str).size,col);
     cout<<"The data array after sorting"<<endl;
-    prntAry(str->array,str->size,col);
+    prntAry((*str).array,(*str).size,col);
     cout<<"The data array using the indexed array after sorting"<<endl;
     prntStr(str,col);
     //Exit stage right
