@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     float avgRn=0;//average rainfall each month
     float avgTemp=0;//average temperature of all months
     int hstTemp=mnth[0].hgTemp;//highest temperature
-    int lwTemp=mnth[0].lwTemp;//lowest temperature
+    int lwTemps=mnth[0].lwTemp;//lowest temperature
     int idxMnt=0,ilw=0;//the index of mnth
     for(int i=0;i<SIZE;i++) {
         //sum all total rainfall
@@ -69,8 +69,8 @@ int main(int argc, char** argv) {
         if(mnth[i].hgTemp>hstTemp) {
             hstTemp=mnth[i].hgTemp;
             idxMnt=i;
-        } else if(mnth[i].lwTemp<lwTemp) {
-            lwTemp=mnth[i].lwTemp;
+        } else if(mnth[i].lwTemp<lwTemps) {
+            lwTemps=mnth[i].lwTemp;
             ilw=i;
         }
     }
@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
     cout<<"Average monthly rainfall(mm) is "<<avgRn<<endl;
     cout<<"Total rainfall(mm) for the year is "<<yearRn<<endl;
     cout<<"Highest temperature(F) is "<<hstTemp<<" in "<<"Month "<<"#"<<(idxMnt+1)<<endl;
-    cout<<"Lowest temperature(F) is "<<lwTemp<<" in "<<"Month "<<"#"<<(ilw+1)<<endl;
+    cout<<"Lowest temperature(F) is "<<lwTemps<<" in "<<"Month "<<"#"<<(ilw+1)<<endl;
     cout<<"The average of all the monthly average temperatures(F) is "<<avgTemp<<endl;
     //Exit stage right
     return 0;
