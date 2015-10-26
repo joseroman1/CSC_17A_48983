@@ -8,8 +8,11 @@
 //System Libraries
 #include <iostream>
 #include <cstdlib>
+#include <string>
 #include <fstream>
 #include <vector>
+#include <ctime>
+
 using namespace std;
 
 //User Libraries
@@ -124,7 +127,7 @@ void file(User *w,int o) {
 void dFile(User *p,int q) {
     fstream in;
     cout<<"Read from the file..."<<endl<<endl;
-    in.open("users.txt",ios::in|ios::binary);
+    in.open("user.txt",ios::in|ios::binary);
     if(!in.fail()) {
        in.read(reinterpret_cast<char *>(p),sizeof(User)*q); 
     }
@@ -238,5 +241,175 @@ void bidding(User &w,char &value,int &number,int nUsers,int &v,int opn,bool &g) 
         if(g) cout<<" "<<endl;
         else cout<<" only"<<endl;
         v++;
+    }
+}
+
+void cChlg(int &opn,User w,char value,int number,int nUsers,int v,bool g) {
+    if(v!=0&&opn==-1) {
+        //This determine challenge or not
+        if(g) {
+            if(gQnty(w,value,g)>=number) opn=-1; //Bided number of a kind dice <= Computer's, not challenge 
+            else if(gQnty(w,value,g)==0&&number>=nUsers*2) opn=w.oGame;
+            else if(gQnty(w,value,g)==1&&number-1>(nUsers-1)*2) {
+                if(rand()%6<3) opn=w.oGame; 
+            } else if(gQnty(w,value,g)==2&&number-2>(nUsers-1)*2) {
+                if(rand()%6<2) opn=w.oGame; 
+            } else if(gQnty(w,value,g)==3&&number-3>(nUsers-1)*2) {
+                if(rand()%6<2) opn=w.oGame; 
+            } else if(gQnty(w,value,g)>=4&&number-gQnty(w,value,g)>(nUsers-1)*2) {
+                opn=w.oGame; 
+            }
+            if(number>=nUsers*3) {
+                if(number>=nUsers*4) opn=w.oGame;
+                else {
+                    if(rand()%5<4) opn=w.oGame;
+                }
+            }
+        } else {
+            if(number-gQnty(w,value,g)>=2*(nUsers-1)) opn=w.oGame;
+        }
+        if(opn==w.oGame) cout<<"Computer Number"<<w.oGame<<" challenge"<<endl;
+        else cout<<"Computer Number"<<w.oGame<<" does not challenge"<<endl;
+    }
+}
+
+void cBidding(int opn,User &w,char &value,int &number,int &v,bool g) {
+    //bidding
+    if(opn==-1) {
+        char fTem;
+        if(g) {
+            vector<char> nExist=gNEx(w.dice);
+            //truth 3/5
+            if(rand()%5>=2||(nExist.size()==1&&nExist[0]=='1')) {  
+                if(rand()%3<2&&value==gFreq(w.dice))  { //get the most frequent value of of AI's dice
+                    fTem=value;
+                } else { //randomly get a dice from existed dice
+                    vector<char> ext=gEx(w.dice);
+
+                    do {
+                        fTem=ext[rand()%ext.size()];
+                    } while(fTem=='1');
+                }
+
+                if(fTem<=value) number++;
+                value=fTem;
+
+
+            } else { //lie 2/5
+                //The value of dice that the computer doesn't have
+                char fTem;
+                do {
+                    fTem=nExist[rand()%nExist.size()];
+                } while(fTem=='1');
+                if(fTem<=value) number++;
+                value=fTem;
+            }
+        } else {
+            value=gFreq(w.dice);
+            if(fTem<=value) number++;
+        }
+        cout<<"Computer Number"<<w.oGame<<" bidding "<<number<<"  "<<value<<"s";
+        if(g) cout<<" "<<endl;
+        else cout<<" only"<<endl;
+        v++;
+    }
+}
+
+//The quantity of one value of dice of one user
+int gQnty(User w,char value,bool g) { 
+    int number=0;
+    int ons=0;
+    for(int i=0;i<5;i++) {
+        if(w.dice[i]==value) number++;
+        if(g&&value!='1'&&w.dice[i]=='1') ons++;
+        //When 1 is not wild
+    }
+    return number+ons;
+}
+
+//The value of dice that doesn't ext in computer
+vector<char> gNEx(char *dice) {
+    vector<char> nExist;//not ext value of dice
+    //initialize 6 elements from 1 to 6
+    for(int i=1;i<=6;i++) {
+        nExist.push_back(i+48);
+    }
+    //when the value of the dice comes up, set that value in the vector to 0
+    for(int i=0;i<5;i++) {
+        nExist[static_cast<int>(dice[i]-48)-1]='0';
+    }
+    //Sort the vector form high to low
+    for(int i=0;i<5;i++) {
+        for(int j=i+1;j<6;j++) {
+            if(nExist[i]<nExist[j]) {
+                char temp=nExist[i];
+                nExist[i]=nExist[j];
+                nExist[j]=temp;
+            }
+        }
+    }
+    //File the existing number
+    for(int i=5;i>=0;i--) {
+        if(nExist[i]=='0') nExist.pop_back();
+    }
+    return nExist;//return the vector
+}
+
+//The value of dice that ext in computer
+vector<char> gEx(char *dice) {
+    bool isd;
+    vector<char> ext;
+    for(int i=0;i<5;i++) {
+        isd=false;
+        //use for loop to get the existing dice
+        for(int j=0;j<ext.size();j++) {
+            if(ext[j]==dice[i]) isd=true;
+        }
+        if(!isd) ext.push_back(dice[i]);
+    }
+    return ext;
+}
+
+//The most frequent value of dice in the dice
+char gFreq(char *dice) {
+    int *temp=new int[5];
+    int count=1;//Count for the dice
+    int high;//Highest number
+    int index;//index
+    //If dice: 2 2 3 4 2, then temp: 3 3 1 1 3
+    for(int i=0;i<5;i++) {
+        for(int j=0;j<5;j++) {
+            if(dice[i]==dice[j]) count++;
+        }
+        temp[i]=count;
+        count=1;
+    }
+    high=temp[0];//initial the highest number
+    index=0;//initial the index
+    //File the highest and its index
+    for(int i=0;i<5;i++) {
+        if(temp[i]>high) {
+            high=temp[i];
+            index=i;
+        }
+    }
+    delete []temp;//delete allocate memory
+    return dice[index];
+}
+
+//Output the result
+void rstl(int number,char value,int nUsers,User *users,int opn,bool g) {
+    int total=0;
+    //Count the value of all users
+    for(int i=0;i<nUsers;i++) {
+        total+=gQnty(users[i],value,g);
+    }
+    cout<<endl<<"There are "<<total<<" "<<value<<"s"<<endl;
+    if(total>=number) {
+        if(opn==0) cout<<"Your challenge failed"<<endl;
+        else cout<<"Computer Number"<<opn<<"'s challenge failed"<<endl;
+    } else {
+        if(opn==0) cout<<"Your challenge succeed"<<endl;
+        else cout<<"Computer Number"<<opn<<"'s challenge succeed"<<endl;
     }
 }
